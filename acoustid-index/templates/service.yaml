@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "acoustid-index.fullname" . }}
+  labels:
+{{ include "acoustid-index.labels" . | indent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6080
+      targetPort: 6080
+      protocol: TCP
+      name: acoustid-index
+  selector:
+    app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

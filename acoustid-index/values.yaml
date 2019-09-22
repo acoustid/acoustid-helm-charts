@@ -1,0 +1,30 @@
+replicaCount: 1
+
+image:
+  repository: quay.io/acoustid/acoustid-index
+  tag: 2018.01.13
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+persistence:
+  enabled: false
+  # storageClassName: ""
+  # size: 1Gi
+
+resources: {}
+  # If you do want to specify resources, uncomment the following lines, adjust them as
+  # necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
