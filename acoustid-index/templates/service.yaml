@@ -14,3 +14,4 @@ spec:
   selector:
     app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}

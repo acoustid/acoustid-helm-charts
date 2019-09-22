@@ -33,8 +33,8 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-          - name: data
-            mountPath: /var/lib/acoustid
+            - name: data
+              mountPath: /var/lib/acoustid
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -49,17 +49,17 @@ spec:
     {{- end }}
 {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
-  - metadata:
-      name: data
-      labels:
-        app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/managed-by: {{ .Release.Service }}
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      storageClassName: {{ .Values.persistence.storageClassName }}
-      resources:
-        requests:
-          storage: {{ .Values.persistence.size }}
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
+          app.kubernetes.io/instance: {{ .Release.Name }}
+          app.kubernetes.io/managed-by: {{ .Release.Service }}
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
 {{- end }}
