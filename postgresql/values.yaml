@@ -1,0 +1,49 @@
+image:
+  repository: quay.io/acoustid/postgresql
+  tag: v2019.09.26-pg11
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  # name:
+
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+sentinel:
+  replicas: 2
+  resources: {}
+
+proxy:
+  replicas: 2
+  resources: {}
+
+keeper:
+  replicas: 2
+  resources: {}
+
+superuser:
+  # secretName:
+  username: postgres
+  password:
+
+replication:
+  # secretName:
+  username: replication
+  password:
+
+initClusterSpec:
+  initMode: new
+  usePgrewind: true
+
+debug: false
+
+# nameOverride:
+# fullnameOverride:
+
+labels: []
+
+annotations: []

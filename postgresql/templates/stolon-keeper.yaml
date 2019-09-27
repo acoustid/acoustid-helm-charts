@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "postgresql.fullname" . }}-stolon-keeper
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+    app.kubernetes.io/component: stolon-keeper
+spec:
+  serviceName: stolon-keeper
+  replicas: {{ .Values.keeper.replicas }}
+  selector:
+    matchLabels:
+      {{- include "postgresql.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: stolon-keeper
+  template:
+    metadata:
+      labels:
+        {{- include "postgresql.labels" . | nindent 8 }}
+        app.kubernetes.io/component: stolon-keeper
+        component: stolon-keeper
+        stolon-cluster: {{ .Release.Name }}
+      annotations:
+        {{- include "postgresql.annotations" . | nindent 8 }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: {{ include "postgresql.serviceAccountName" . }}
+      containers:
+        - name: stolon-keeper
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/bin/bash"
+            - "-ec"
+            - |
+              # Generate our keeper uid using the pod index
+              IFS='-' read -ra ADDR <<< "$(hostname)"
+              export STKEEPER_UID="keeper${ADDR[-1]}"
+              export POD_IP=$(hostname -i)
+              export STKEEPER_PG_LISTEN_ADDRESS=$POD_IP
+              chown postgres:postgres /data
+              exec gosu postgres stolon-keeper --data-dir /data
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: STKEEPER_CLUSTER_NAME
+              value: {{ .Release.Name }}
+            - name: STKEEPER_STORE_BACKEND
+              value: kubernetes
+            - name: STKEEPER_KUBE_RESOURCE_KIND
+              value: configmap
+            - name: STKEEPER_PG_REPL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.replicationSecretName" . }}
+                  key: username
+            - name: STKEEPER_PG_REPL_PASSWORDFILE
+              value: "/etc/secrets/replication/password"
+            - name: STKEEPER_PG_SU_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.superuserSecretName" . }}
+                  key: username
+            - name: STKEEPER_PG_SU_PASSWORDFILE
+              value: "/etc/secrets/superuser/password"
+            - name: STKEEPER_METRICS_LISTEN_ADDRESS
+              value: "0.0.0.0:8080"
+            {{- if .Values.debug }}
+            - name: STKEEPER_DEBUG
+              value: "true"
+            {{- end }}
+          ports:
+            - name: postgresql
+              containerPort: 5432
+            - name: metrics
+              containerPort: 8080
+          volumeMounts:
+            - mountPath: /data
+              name: {{ include "postgresql.dataVolumeName" . }}
+            - mountPath: /etc/secrets/superuser
+              name: {{ include "postgresql.superuserSecretName" . }}
+            - mountPath: /etc/secrets/replication
+              name: {{ include "postgresql.replicationSecretName" . }}
+          {{- if .Values.keeper.resources }}
+          resources:
+            {{- toYaml .Values.keeper.resources | nindent 12 }}
+          {{- end }}
+      volumes:
+{{- if not .Values.persistence.enabled }}
+        - name: {{ include "postgresql.dataVolumeName" . }}
+          emptyDir: {}
+{{- end }}
+        - name: {{ include "postgresql.superuserSecretName" . }}
+          secret:
+            secretName: {{ include "postgresql.superuserSecretName" . }}
+        - name: {{ include "postgresql.replicationSecretName" . }}
+          secret:
+            secretName: {{ include "postgresql.replicationSecretName" . }}
+{{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ include "postgresql.dataVolumeName" . }}
+        labels:
+          {{- include "postgresql.volumeClaimTemplateLabels" . | nindent 10 }}
+      spec:
+        accessModes: [ "{{ .Values.persistence.accessMode }}" ]
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
+{{- end }}
