@@ -1,0 +1,17 @@
+apiVersion: v1
+name: redis
+description: HA Redis cluster
+version: 3.7.10
+appVersion: 5.0.5
+home: https://redis.io/
+icon: https://bitnami.com/assets/stacks/redis/img/redis-stack-110x117.png
+keywords:
+  - redis
+  - database
+sources:
+  - https://github.com/antirez/redis
+  - https://github.com/helm/charts/tree/master/stable/redis-ha
+  - https://github.com/oliver006/redis_exporter
+maintainers:
+  - name: lalinsky
+    email: lalinsky@gmail.com
