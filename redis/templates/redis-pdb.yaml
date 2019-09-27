@@ -4,7 +4,7 @@ kind: PodDisruptionBudget
 metadata:
   name: {{ template "redis.fullname" . }}-pdb
   labels:
-{{ include "labels.standard" . | indent 4 }}
+{{ include "redis.labels" . | indent 4 }}
 spec:
   selector:
     matchLabels:

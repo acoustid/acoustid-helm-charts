@@ -8,7 +8,7 @@ kind: Service
 metadata:
   name: {{ $fullName }}-announce-{{ $i }}
   labels:
-{{ include "labels.standard" $root | indent 4 }}
+{{ include "redis.labels" $root | indent 4 }}
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   {{- if $root.Values.serviceAnnotations }}

@@ -25,6 +25,12 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "redis.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 
 {{/*
 Return sysctl image
@@ -36,29 +42,24 @@ Return sysctl image
 {{- end -}}
 
 {{- /*
-Credit: @technosophos
-https://github.com/technosophos/common-chart/
-labels.standard prints the standard Helm labels.
-The standard labels are frequently used in metadata.
+Create labels that are frequently used in metadata.
 */ -}}
-{{- define "labels.standard" -}}
-app: {{ template "redis.name" . }}
-heritage: {{ .Release.Service | quote }}
-release: {{ .Release.Name | quote }}
-chart: {{ template "chartref" . }}
+{{- define "redis.labels" -}}
+app.kubernetes.io/name: {{ include "redis.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ include "redis.chart" . }}
 {{- end -}}
 
 {{- /*
-Credit: @technosophos
-https://github.com/technosophos/common-chart/
-chartref prints a chart name and version.
-It does minimal escaping for use in Kubernetes labels.
-Example output:
-  zookeeper-1.2.3
-  wordpress-3.2.1_20170219
+Create labels that are frequently used for matching resources.
 */ -}}
-{{- define "chartref" -}}
-  {{- replace "+" "_" .Chart.Version | printf "%s-%s" .Chart.Name -}}
+{{- define "redis.matchLabels" -}}
+app.kubernetes.io/name: {{ include "redis.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/*

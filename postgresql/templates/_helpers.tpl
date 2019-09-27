@@ -31,12 +31,12 @@ Create chart name and version as used by the chart label.
 
 {{- define "postgresql.labels" -}}
 app.kubernetes.io/name: {{ include "postgresql.name" . }}
-helm.sh/chart: {{ include "postgresql.chart" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ include "postgresql.chart" . }}
 {{- if .Values.labels -}}
 {{- toYaml .Values.labels | nindent 0 }}
 {{- end -}}
