@@ -4,7 +4,7 @@ description: HA PostgreSQL cluster managed by Stolon
 version: 0.1.0
 appVersion: 2019.09.26-pg11
 home: https://www.postgresql.org
-logo: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.png
+icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.png
 sources:
   - https://github.com/acoustid/docker-postgresql
   - https://github.com/postgres/postgres
