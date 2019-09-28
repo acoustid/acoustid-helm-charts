@@ -77,7 +77,7 @@ spec:
               containerPort: 8080
           volumeMounts:
             - mountPath: /data
-              name: {{ include "postgresql.dataVolumeName" . }}
+              name: data
             - mountPath: /etc/secrets/superuser
               name: {{ include "postgresql.superuserSecretName" . }}
             - mountPath: /etc/secrets/replication
@@ -88,7 +88,7 @@ spec:
           {{- end }}
       volumes:
 {{- if not .Values.persistence.enabled }}
-        - name: {{ include "postgresql.dataVolumeName" . }}
+        - name: data
           emptyDir: {}
 {{- end }}
         - name: {{ include "postgresql.superuserSecretName" . }}
@@ -100,7 +100,7 @@ spec:
 {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:
-        name: {{ include "postgresql.dataVolumeName" . }}
+        name: data
         labels:
           {{- include "postgresql.volumeClaimTemplateLabels" . | nindent 10 }}
       spec:
