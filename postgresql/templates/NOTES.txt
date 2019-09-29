@@ -11,5 +11,4 @@ To connect to your database run the following command:
 
 You can control the cluster using `stolonctl` by running the following command:
 
-    STOLONCTL_POD_NAME=$(kubectl get pod --namespace {{ .Release.Namespace }} -l app.kubernetes.io/name=postgresql,app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=stolonctl -o name)
-    kubectl --namespace {{ .Release.Namespace }} exec -ti $STOLONCTL_POD_NAME stolonctl
+    kubectl --namespace {{ .Release.Namespace }} exec -ti deployment/{{ include "postgresql.fullname" . }}-stolonctl stolonctl
