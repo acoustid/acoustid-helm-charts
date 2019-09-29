@@ -5,12 +5,10 @@ image:
   tag: 2018.01.13
   pullPolicy: IfNotPresent
 
-nameOverride: ""
-fullnameOverride: ""
-
 persistence:
   enabled: true
   storageClassName: ""
+  accessMode: ReadWriteOnce
   size: 1Gi
 
 resources: {}
@@ -28,3 +26,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# nameOverride:
+# fullnameOverride:
