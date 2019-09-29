@@ -9,9 +9,9 @@ nameOverride: ""
 fullnameOverride: ""
 
 persistence:
-  enabled: false
-  # storageClassName: ""
-  # size: 1Gi
+  enabled: true
+  storageClassName: ""
+  size: 1Gi
 
 resources: {}
   # If you do want to specify resources, uncomment the following lines, adjust them as

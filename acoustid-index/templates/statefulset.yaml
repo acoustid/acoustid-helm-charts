@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: {{ include "acoustid-index.fullname" . }}
   labels:
-{{ include "acoustid-index.labels" . | indent 4 }}
+    {{- include "acoustid-index.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -14,9 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        {{- include "acoustid-index.labels" . | nindent 8 }}
     spec:
       containers:
         - name: index
@@ -34,7 +32,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: data
-              mountPath: /var/lib/acoustid
+              mountPath: /var/lib/acoustid-index
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
