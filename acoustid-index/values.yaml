@@ -5,6 +5,20 @@ image:
   tag: 2018.01.13
   pullPolicy: IfNotPresent
 
+updater:
+  enabled: false
+
+  image:
+    repository: quay.io/acoustid/acoustid-index-updater
+    tag: master
+    pullPolicy: IfNotPresent
+
+  database:
+    name: acoustid
+    host: postgresql
+    port: 5432
+    userSecret: acoustid-postgresql-user
+
 persistence:
   enabled: true
   storageClassName: ""

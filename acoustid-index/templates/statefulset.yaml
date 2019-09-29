@@ -33,6 +33,28 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/acoustid-index
+        {{ if .Values.updater.enabled }}
+        - name: updater
+          image: "{{ .Values.updater.image.repository }}:{{ .Values.updater.image.tag }}"
+          imagePullPolicy: {{ .Values.updater.image.pullPolicy | quote }}
+          env:
+            - name: ACOUSTID_DATABASE_NAME
+              value: {{ .Values.updater.database.name | quote }}
+            - name: ACOUSTID_DATABASE_HOST
+              value: {{ .Values.updater.database.host | quote }}
+            - name: ACOUSTID_DATABASE_PORT
+              value: {{ .Values.updater.database.port | quote }}
+            - name: ACOUSTID_DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.updater.database.userSecret | quote }}
+                  key: username
+            - name: ACOUSTID_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.updater.database.userSecret | quote }}
+                  key: password
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
