@@ -38,6 +38,10 @@ spec:
           image: "{{ .Values.updater.image.repository }}:{{ .Values.updater.image.tag }}"
           imagePullPolicy: {{ .Values.updater.image.pullPolicy | quote }}
           env:
+            - name: ACOUSTID_INDEX_HOST
+              value: "127.0.0.1"
+            - name: ACOUSTID_INDEX_PORT
+              value: "6080"
             - name: ACOUSTID_DATABASE_NAME
               value: {{ .Values.updater.database.name | quote }}
             - name: ACOUSTID_DATABASE_HOST
