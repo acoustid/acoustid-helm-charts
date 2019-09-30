@@ -8,9 +8,7 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      {{- include "acoustid-index.matchLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
@@ -76,7 +74,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "acoustid-index.labels" . | nindent 10 }}
+          {{- include "acoustid-index.matchLabels" . | nindent 10 }}
       spec:
         accessModes:
           - {{ .Values.persistence.accessMode | quote }}

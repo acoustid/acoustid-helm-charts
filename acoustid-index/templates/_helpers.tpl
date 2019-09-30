@@ -31,15 +31,16 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{/*
-Common labels
-*/}}
-{{- define "acoustid-index.labels" -}}
+{{- define "acoustid-index.matchLabels" -}}
 app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
-helm.sh/chart: {{ include "acoustid-index.chart" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "acoustid-index.labels" -}}
+{{ include "acoustid-index.matchLabels" . }}
+helm.sh/chart: {{ include "acoustid-index.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
