@@ -10,7 +10,7 @@ updater:
 
   image:
     repository: quay.io/acoustid/acoustid-index-updater
-    tag: master
+    tag: v2019.09.30
     pullPolicy: IfNotPresent
 
   database:
