@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ template "redis.fullname" . }}
   labels:
-{{ include "redis.labels" . | indent 4 }}
+    {{- include "redis.labels" . | nindent 4 }}
   annotations:
   {{- if .Values.serviceAnnotations }}
 {{ toYaml .Values.serviceAnnotations | indent 4 }}
@@ -27,5 +27,5 @@ spec:
     targetPort: exporter-port
 {{- end }}
   selector:
-    release: {{ .Release.Name }}
-    app: {{ template "redis.name" . }}
+    {{- include "redis.matchLabels" . | nindent 4 }}
+    app.kubernetes.io/component: redis

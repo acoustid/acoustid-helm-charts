@@ -47,11 +47,9 @@ Create labels that are frequently used in metadata.
 {{- define "redis.labels" -}}
 app.kubernetes.io/name: {{ include "redis.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- range $key, $value := .Values.labels }}
+{{ $key }}: {{ $value }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-helm.sh/chart: {{ include "redis.chart" . }}
 {{- end -}}
 
 {{- /*

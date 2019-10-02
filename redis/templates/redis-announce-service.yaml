@@ -8,7 +8,7 @@ kind: Service
 metadata:
   name: {{ $fullName }}-announce-{{ $i }}
   labels:
-{{ include "redis.labels" $root | indent 4 }}
+    {{- include "redis.labels" $root | nindent 4 }}
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   {{- if $root.Values.serviceAnnotations }}
@@ -33,7 +33,7 @@ spec:
     targetPort: exporter-port
   {{- end }}
   selector:
-    release: {{ $root.Release.Name }}
-    app: {{ include "redis.name" $root }}
-    "statefulset.kubernetes.io/pod-name": {{ $fullName }}-server-{{ $i }}
+    {{- include "redis.matchLabels" $root | nindent 4 }}
+    app.kubernetes.io/component: redis
+    statefulset.kubernetes.io/pod-name: {{ $fullName }}-server-{{ $i }}
 {{- end }}

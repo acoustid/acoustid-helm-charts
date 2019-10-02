@@ -3,10 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "redis.fullname" . }}-configmap
   labels:
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ template "redis.fullname" . }}
+    {{- include "redis.labels" . | nindent 4 }}
 data:
   redis.conf: |
 {{- if .Values.redis.customConfig }}

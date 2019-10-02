@@ -1,10 +1,11 @@
 {{- if .Values.haproxy.enabled }}
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: {{ template "redis.fullname" . }}-haproxy
   labels:
     {{- include "redis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: haproxy
 spec:
   strategy:
     type: RollingUpdate
@@ -12,14 +13,14 @@ spec:
   replicas: {{ .Values.haproxy.replicas }}
   selector:
     matchLabels:
-      app: {{ template "redis.name" . }}-haproxy
-      release: {{ .Release.Name }}
+      {{- include "redis.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: haproxy
   template:
     metadata:
       name: {{ template "redis.fullname" . }}-haproxy
       labels:
-        app: {{ template "redis.name" . }}-haproxy
-        release: {{ .Release.Name }}
+        {{- include "redis.labels" . | nindent 8 }}
+        app.kubernetes.io/component: haproxy
       annotations:
         prometheus.io/path: /metrics
         prometheus.io/port: "9101"

@@ -4,10 +4,7 @@ kind: Role
 metadata:
   name: {{ template "redis.fullname" . }}
   labels:
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ template "redis.fullname" . }}
+    {{- include "redis.labels" . | nindent 4 }}
 rules:
 - apiGroups:
     - ""

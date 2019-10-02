@@ -4,11 +4,11 @@ kind: PodDisruptionBudget
 metadata:
   name: {{ template "redis.fullname" . }}-pdb
   labels:
-{{ include "redis.labels" . | indent 4 }}
+    {{- include "redis.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      release: {{ .Release.Name }}
-      app: {{ template "redis.name" . }}
-{{ toYaml .Values.podDisruptionBudget | indent 2 }}
+      {{- include "redis.matchLabels" . | nindent 4 }}
+      app.kubernetes.io/component: redis
+  {{ toYaml .Values.podDisruptionBudget | indent 2 }}
 {{- end -}}

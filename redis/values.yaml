@@ -180,16 +180,18 @@ additionalAffinities: {}
 ##     requiredDuringSchedulingIgnoredDuringExecution:
 ##       - labelSelector:
 ##           matchLabels:
-##             app: {{ template "redis.name" . }}
-##             release: {{ .Release.Name }}
+##             app.kubernetes.io/name: {{ template "redis.name" . }}
+##             app.kubernetes.io/instance: {{ .Release.Name }}
+##             app.kubernetes.io/component: redis
 ##         topologyKey: kubernetes.io/hostname
 ##     preferredDuringSchedulingIgnoredDuringExecution:
 ##       - weight: 100
 ##         podAffinityTerm:
 ##           labelSelector:
 ##             matchLabels:
-##               app:  {{ template "redis.name" . }}
-##               release: {{ .Release.Name }}
+##               app.kubernetes.io/name: {{ template "redis.name" . }}
+##               app.kubernetes.io/instance: {{ .Release.Name }}
+##               app.kubernetes.io/component: redis
 ##           topologyKey: failure-domain.beta.kubernetes.io/zone
 ##
 affinity: |

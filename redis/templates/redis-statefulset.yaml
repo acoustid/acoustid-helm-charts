@@ -3,12 +3,13 @@ kind: StatefulSet
 metadata:
   name: {{ template "redis.fullname" . }}-server
   labels:
-{{ include "redis.labels" . | indent 4 }}
+    {{- include "redis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: redis
 spec:
   selector:
     matchLabels:
-      release: {{ .Release.Name }}
-      app: {{ template "redis.name" . }}
+      {{- include "redis.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: redis
   serviceName: {{ template "redis.fullname" . }}
   replicas: {{ .Values.replicas }}
   podManagementPolicy: OrderedReady
@@ -27,11 +28,8 @@ spec:
         prometheus.io/path: {{ .Values.exporter.scrapePath }}
       {{- end }}
       labels:
-        release: {{ .Release.Name }}
-        app: {{ template "redis.name" . }}
-        {{- range $key, $value := .Values.labels }}
-        {{ $key }}: {{ $value }}
-        {{- end }}
+        {{- include "redis.labels" . | nindent 8 }}
+        app.kubernetes.io/component: redis
     spec:
       {{- if .Values.schedulerName }}
       schedulerName: "{{ .Values.schedulerName }}"
@@ -58,15 +56,15 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  app: {{ template "redis.name" . }}
-                  release: {{ .Release.Name }}
+                  {{- include "redis.matchLabels" . | nindent 18 }}
+                  app.kubernetes.io/component: redis
               topologyKey: kubernetes.io/hostname
     {{- else }}
           preferredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  app: {{ template "redis.name" . }}
-                  release: {{ .Release.Name }}
+                  {{- include "redis.matchLabels" . | nindent 18 }}
+                  app.kubernetes.io/component: redis
               topologyKey: kubernetes.io/hostname
     {{- end }}
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -74,8 +72,8 @@ spec:
               podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app:  {{ template "redis.name" . }}
-                    release: {{ .Release.Name }}
+                    {{- include "redis.matchLabels" . | nindent 20 }}
+                    app.kubernetes.io/component: redis
                 topologyKey: failure-domain.beta.kubernetes.io/zone
     {{- end }}
       securityContext:
@@ -258,6 +256,8 @@ spec:
       {{- range $key, $value := .Values.persistentVolume.annotations }}
         {{ $key }}: {{ $value }}
       {{- end }}
+      labels:
+        {{- include "redis.labels" . | nindent 8 }}
     spec:
       accessModes:
       {{- range .Values.persistentVolume.accessModes }}
