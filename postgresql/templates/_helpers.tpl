@@ -68,7 +68,7 @@ prometheus.io/port: "8080"
 
 {{- define "postgresql.superuserSecretName" -}}
 {{- if .Values.superuser.secretName -}}
-{{ .Values.superuserSecretName }}
+{{ .Values.superuser.secretName }}
 {{- else -}}
 {{ include "postgresql.fullname" . }}-superuser
 {{- end -}}
@@ -76,7 +76,7 @@ prometheus.io/port: "8080"
 
 {{- define "postgresql.replicationSecretName" -}}
 {{- if .Values.replication.secretName -}}
-{{ .Values.replicationSecretName }}
+{{ .Values.replication.secretName }}
 {{- else -}}
 {{ include "postgresql.fullname" . }}-replication
 {{- end -}}
