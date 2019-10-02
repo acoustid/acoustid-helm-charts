@@ -32,8 +32,8 @@ spec:
             - "/bin/bash"
             - "-ec"
             - |
-              chown postgres:postgres /data
-              exec gosu postgres stolon-keeper --data-dir /data
+              chown postgres:postgres $STKEEPER_DATA_DIR
+              exec gosu postgres stolon-keeper
           env:
             - name: POD_NAME
               valueFrom:
@@ -45,6 +45,8 @@ spec:
               value: kubernetes
             - name: STKEEPER_KUBE_RESOURCE_KIND
               value: configmap
+            - name: STKEEPER_DATA_DIR
+              value: /data
             - name: STKEEPER_PG_REPL_USERNAME
               valueFrom:
                 secretKeyRef:
