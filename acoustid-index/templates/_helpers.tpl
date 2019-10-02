@@ -34,13 +34,9 @@ Create chart name and version as used by the chart label.
 {{- define "acoustid-index.matchLabels" -}}
 app.kubernetes.io/name: {{ include "acoustid-index.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "acoustid-index.labels" -}}
 {{ include "acoustid-index.matchLabels" . }}
-helm.sh/chart: {{ include "acoustid-index.chart" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
+{{ toYaml .Values.labels }}
 {{- end -}}

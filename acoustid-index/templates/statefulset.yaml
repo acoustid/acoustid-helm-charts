@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "acoustid-index.labels" . | nindent 4 }}
 spec:
+  serviceName: acoustid-index
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
@@ -74,7 +75,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "acoustid-index.matchLabels" . | nindent 10 }}
+          {{- include "acoustid-index.labels" . | nindent 10 }}
       spec:
         accessModes:
           - {{ .Values.persistence.accessMode | quote }}

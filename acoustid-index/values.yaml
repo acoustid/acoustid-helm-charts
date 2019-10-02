@@ -41,5 +41,7 @@ tolerations: []
 
 affinity: {}
 
+labels: {}
+
 # nameOverride:
 # fullnameOverride:
