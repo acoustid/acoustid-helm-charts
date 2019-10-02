@@ -1,0 +1,49 @@
+{{ if .Values.slony.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "postgresql.fullname" . }}-slon
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+    app.kubernetes.io/component: slon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "postgresql.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: slon
+  template:
+    metadata:
+      labels:
+        {{- include "postgresql.labels" . | nindent 8 }}
+        app.kubernetes.io/component: slon
+    spec:
+      containers:
+        - name: slon
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          command:
+            - "/bin/bash"
+            - "-ec"
+            - |
+              cat <<EOS >/etc/slon.conf
+              syslog 0
+              log_level 0
+              log_timestamp 1
+              log_pid 0
+              cluster_name {{ .Values.slony.clusterName }}
+              conn_info 'host={{ include "postgresql.fullname" . }} dbname={{ .Values.slony.databaseName }} user=$SLONY_USER_NAME password=$SLONY_USER_PASSWORD sslmode=disable'
+              EOS
+              exec gosu postgres slon -f /etc/slon.conf
+          env:
+            - name: SLONY_USER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.superuserSecretName" . }}
+                  key: username
+            - name: SLONY_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.superuserSecretName" . }}
+                  key: password
+{{ end }}

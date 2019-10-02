@@ -39,6 +39,11 @@ initClusterSpec:
   initMode: new
   usePgrewind: true
 
+slony:
+  enabled: false
+  clusterName: ""
+  databaseName: ""
+
 debug: false
 
 # nameOverride:
