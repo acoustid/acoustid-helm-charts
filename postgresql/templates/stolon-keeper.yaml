@@ -83,6 +83,10 @@ spec:
               name: {{ include "postgresql.superuserSecretName" . }}
             - mountPath: /etc/secrets/replication
               name: {{ include "postgresql.replicationSecretName" . }}
+            {{- if .Values.backup.enabled }}
+            - mountPath: /etc/wal-g
+              name: {{ .Values.backup.walgEnvDirSecret | quote }}
+            {{- end }}
           {{- if .Values.keeper.resources }}
           resources:
             {{- toYaml .Values.keeper.resources | nindent 12 }}
