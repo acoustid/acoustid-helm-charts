@@ -85,3 +85,11 @@ prometheus.io/port: "8080"
 {{- define "postgresql.dataVolumeName" -}}
 {{ include "postgresql.fullname" . }}-data
 {{- end -}}
+
+{{- define "postgresql.backupConfigSecretName" -}}
+{{ include "postgresql.fullname" . }}-backup
+{{- end -}}
+
+{{- define "postgresql.backupPath" -}}
+s3://{{ .Values.backup.bucket }}/{{ .Values.backup.prefix }}/{{ .Release.Name }}
+{{- end -}}

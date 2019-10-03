@@ -83,9 +83,11 @@ spec:
               name: {{ include "postgresql.superuserSecretName" . }}
             - mountPath: /etc/secrets/replication
               name: {{ include "postgresql.replicationSecretName" . }}
+            - name: config
+              mountPath: /etc/stolon
             {{- if .Values.backup.enabled }}
-            - mountPath: /etc/wal-g
-              name: {{ .Values.backup.walgEnvDirSecret | quote }}
+            - mountPath: /etc/wal-g.d/env
+              name: wal-g
             {{- end }}
           {{- if .Values.keeper.resources }}
           resources:
@@ -102,6 +104,14 @@ spec:
         - name: {{ include "postgresql.replicationSecretName" . }}
           secret:
             secretName: {{ include "postgresql.replicationSecretName" . }}
+        - name: config
+          configMap:
+            name: {{ include "postgresql.fullname" . }}-config
+        {{- if .Values.backup.enabled }}
+        - name: wal-g
+          secret:
+            secretName: {{ include "postgresql.backupConfigSecretName" . | quote }}
+        {{- end }}
 {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:

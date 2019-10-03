@@ -46,7 +46,10 @@ slony:
 
 backup:
   enabled: false
-  # walgEnvDirSecret:
+  bucket:
+  prefix:
+  aws_access_key_id:
+  aws_secret_access_key:
 
 debug: false
 
