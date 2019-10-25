@@ -14,15 +14,41 @@ spec:
     metadata:
       labels:
         {{- include "acoustid-index.labels" . | nindent 8 }}
+      annotations:
+        {{- include "acoustid-index.annotations" . | nindent 8 }}
+        {{- include "acoustid-index.metricsAnnotations" . | nindent 8 }}
     spec:
       containers:
         - name: index
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          command:
+            - "catchsegv"
+          args:
+            - "fpi-server"
+            - "--directory"
+            - "/var/lib/acoustid-index"
+            - "--mmap"
+            - "--address"
+            - "0.0.0.0"
+            - "--port"
+            - "6080"
+            {{- if .Values.metrics.enabled }}
+            - "--metrics"
+            - "--metrics-address"
+            - "0.0.0.0"
+            - "--metrics-port"
+            - "6081"
+            {{- end }}
           ports:
             - name: acoustid-index
               containerPort: 6080
               protocol: TCP
+            {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+            {{- end }}
           livenessProbe:
             tcpSocket:
               port: 6080

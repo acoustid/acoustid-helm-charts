@@ -40,3 +40,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ include "acoustid-index.matchLabels" . }}
 {{ toYaml .Values.labels }}
 {{- end -}}
+
+{{- define "acoustid-index.annotations" -}}
+{{- if .Values.annotations }}
+{{ toYaml .Values.annotations }}
+{{- end }}
+{{- end -}}
+
+{{- define "acoustid-index.metricsAnnotations" -}}
+{{- if .Values.metrics.enabled }}
+{{- if .Values.metrics.annotations }}
+{{ toYaml .Values.metrics.annotations }}
+{{- end }}
+{{- end }}
+{{- end -}}

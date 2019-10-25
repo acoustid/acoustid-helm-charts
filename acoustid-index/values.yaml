@@ -2,15 +2,24 @@ replicaCount: 1
 
 image:
   repository: quay.io/acoustid/acoustid-index
-  tag: 2018.01.13
+  tag: 2019.10.14.3
   pullPolicy: IfNotPresent
+
+metrics:
+  enabled: false
+  port: 6081
+  annotations: {}
+    # prometheus.io/scrape: "true"
+    # prometheus.io/path: "/metrics"
+    # prometheus.io/port: "6081"
+    # field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":6081,"schema":"HTTP"}]'
 
 updater:
   enabled: false
 
   image:
     repository: quay.io/acoustid/acoustid-index-updater
-    tag: v2019.09.30
+    tag: v2019.10.14
     pullPolicy: IfNotPresent
 
   database:
@@ -42,6 +51,8 @@ tolerations: []
 affinity: {}
 
 labels: {}
+
+annotations: {}
 
 # nameOverride:
 # fullnameOverride:
