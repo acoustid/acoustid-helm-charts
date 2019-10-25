@@ -1,6 +1,6 @@
 image:
   repository: quay.io/acoustid/postgresql
-  tag: v2019.09.26-pg11
+  tag: v2019.10.15-pg11
   pullPolicy: IfNotPresent
 
 serviceAccount:
@@ -12,6 +12,15 @@ persistence:
   storageClassName: ""
   accessMode: ReadWriteOnce
   size: 1Gi
+
+metrics:
+  enabled: false
+  port: 8080
+  annotations: {}
+
+exporter:
+  enabled: true
+  port: 9187
 
 sentinel:
   replicas: 2
@@ -38,6 +47,8 @@ replication:
 initClusterSpec:
   initMode: new
   usePgrewind: true
+  automaticPgRestart: true
+  dbWaitReadyTimeout: 120s
 
 slony:
   enabled: false

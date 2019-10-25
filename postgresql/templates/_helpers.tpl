@@ -58,14 +58,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 {{- end -}}
 
-{{- define "postgresql.annotations" -}}
-prometheus.io/scrape: "true"
-prometheus.io/port: "8080"
-{{- if .Values.annotations -}}
-{{- toYaml .Values.annotations | nindent 0 }}
-{{- end -}}
-{{- end -}}
-
 {{- define "postgresql.superuserSecretName" -}}
 {{- if .Values.superuser.secretName -}}
 {{ .Values.superuser.secretName }}

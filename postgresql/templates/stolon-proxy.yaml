@@ -19,7 +19,12 @@ spec:
         component: stolon-proxy
         stolon-cluster: {{ .Release.Name }}
       annotations:
-        {{- include "postgresql.annotations" . | nindent 8 }}
+        {{- if .Values.annotations }}
+        {{- toYaml .Values.annotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.proxy.annotations }}
+        {{- toYaml .Values.proxy.annotations | nindent 8 }}
+        {{- end }}
     spec:
       serviceAccountName: {{ include "postgresql.serviceAccountName" . }}
       containers:
@@ -44,7 +49,7 @@ spec:
             - name: STPROXY_LISTEN_ADDRESS
               value: "0.0.0.0"
             - name: STPROXY_METRICS_LISTEN_ADDRESS
-              value: "0.0.0.0:8080"
+              value: "0.0.0.0:{{ .Values.metrics.port }}"
             {{- if .Values.debug }}
             - name: STPROXY_DEBUG
               value: "true"
@@ -53,7 +58,7 @@ spec:
             - name: postgresql
               containerPort: 5432
             - name: metrics
-              containerPort: 8080
+              containerPort: {{ .Values.metrics.port }}
           {{- if .Values.proxy.resources }}
           resources:
             {{- toYaml .Values.proxy.resources | nindent 12 }}

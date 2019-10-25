@@ -9,11 +9,12 @@ data:
 
   run-wal-g.sh: |
     #!/usr/bin/env bash
-    export PGHOST=$STKEEPER_PG_LISTEN_ADDRESS
-    export PGUSER=$(cat /etc/secrets/superuser/username)
-    export PGPASSWORD=$(cat /etc/secrets/superuser/password)
+    export PGUSER=$(cat "$PGUSERFILE")
+    export PGPASSWORD=$(cat "$PGPASSWORDFILE")
     exec envdir /etc/wal-g.d/env wal-g "$@"
 
   run-backup.sh: |
     #!/usr/bin/env bash
-    bash /etc/stolon/run-wal-g.sh backup-push $STKEEPER_DATA_DIR/postgres
+    export PGUSER=$(cat "$PGUSERFILE")
+    export PGPASSWORD=$(cat "$PGPASSWORDFILE")
+    exec envdir /etc/wal-g.d/env wal-g backup-push $STKEEPER_DATA_DIR/postgres

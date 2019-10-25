@@ -17,7 +17,9 @@ spec:
         {{- include "postgresql.labels" . | nindent 8 }}
         app.kubernetes.io/component: stolonctl
       annotations:
-        {{- include "postgresql.annotations" . | nindent 8 }}
+        {{- if .Values.annotations }}
+        {{- toYaml .Values.annotations | nindent 8 }}
+        {{- end }}
     spec:
       serviceAccountName: {{ include "postgresql.serviceAccountName" . }}
       containers:
@@ -35,3 +37,16 @@ spec:
               value: kubernetes
             - name: STOLONCTL_KUBE_RESOURCE_KIND
               value: configmap
+            - name: PGHOST
+              value: {{ include "postgresql.fullname" . }}
+            - name: PGUSERFILE
+              value: /etc/secrets/postgresql/superuser/username
+            - name: PGPASSWORDFILE
+              value: /etc/secrets/postgresql/superuser/password
+          volumeMounts:
+            - name: superuser
+              mountPath: /etc/secrets/postgresql/superuser
+      volumes:
+        - name: superuser
+          secret:
+            secretName: {{ include "postgresql.superuserSecretName" . }}
