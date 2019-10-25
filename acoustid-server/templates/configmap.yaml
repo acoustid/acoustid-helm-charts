@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "acoustid-server.fullname" . }}-config
+  labels:
+    {{- include "acoustid-server.labels" . | nindent 4 }}
+data:
+  acoustid.conf: |
+    [database]
+    two_phase_commit=true
+
+    [database:app]
+    name={{ .Values.database.app.name }}
+    host={{ .Values.database.app.readWrite.host }}
+    port={{ .Values.database.app.readWrite.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [database:app:ro]
+    name={{ .Values.database.app.name }}
+    host={{ .Values.database.app.readOnly.host }}
+    port={{ .Values.database.app.readOnly.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [database:fingerprint]
+    name={{ .Values.database.fingerprint.name }}
+    host={{ .Values.database.fingerprint.readWrite.host }}
+    port={{ .Values.database.fingerprint.readWrite.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [database:fingerprint:ro]
+    name={{ .Values.database.fingerprint.name }}
+    host={{ .Values.database.fingerprint.readOnly.host }}
+    port={{ .Values.database.fingerprint.readOnly.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [database:ingest]
+    name={{ .Values.database.ingest.name }}
+    host={{ .Values.database.ingest.readWrite.host }}
+    port={{ .Values.database.ingest.readWrite.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [database:ingest:ro]
+    name={{ .Values.database.ingest.name }}
+    host={{ .Values.database.ingest.readOnly.host }}
+    port={{ .Values.database.ingest.readOnly.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [database:musicbrainz]
+    name={{ .Values.database.musicbrainz.name }}
+    host={{ .Values.database.musicbrainz.readWrite.host }}
+    port={{ .Values.database.musicbrainz.readWrite.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [database:musicbrainz:ro]
+    name={{ .Values.database.musicbrainz.name }}
+    host={{ .Values.database.musicbrainz.readOnly.host }}
+    port={{ .Values.database.musicbrainz.readOnly.port }}
+    user_file=/etc/secrets/postgresql/acoustid/username
+    password_file=/etc/secrets/postgresql/acoustid/password
+
+    [redis]
+    host={{ .Values.redis.host }}
+    port={{ .Values.redis.port }}
+    sentinel={{ .Values.redis.sentinel }}
+    {{- if .Values.redis.sentinel }}
+    cluster={{ .Values.redis.cluster }}
+    {{- end }}
+
+    [cluster]
+    role=slave
+    base_master_url=https://api.acoustid.org/
+    secret=XXX
+
+    [logging]
+    level=INFO
+
+    [website]
+    base_url=http://acoustid.org/
+    base_https_url=https://acoustid.org/
+    secret=XXX
+    mb_oauth_client_id=XXX
+    mb_oauth_client_secret=XXX
+
+    [uwsgi]
+    workers=2
+    harakiri=120
+    http_timeout=90
+    http_connect_timeout=10
+    post_buffering=0
+    buffer_size=65536
+    offload_threads=1
+
+    [gunicorn]
+    timeout={{ .Values.gunicorn.timeout }}
+    workers={{ .Values.gunicorn.workers }}
+    threads={{ .Values.gunicorn.threads }}
+
+    [rate_limiter]
+    {{- range $key, $val := .Values.ratelimits }}
+    {{ $key }}={{ $val }}
+    {{- end }}

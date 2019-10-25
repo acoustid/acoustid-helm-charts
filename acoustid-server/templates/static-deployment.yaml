@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "acoustid-server.fullname" . }}-static
+  labels:
+    {{- include "acoustid-server.labels" . | nindent 4 }}
+    app.kubernetes.io/component: static
+spec:
+  replicas: {{ .Values.static.replicas }}
+  selector:
+    matchLabels:
+      {{- include "acoustid-server.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: static
+  template:
+    metadata:
+      labels:
+        {{- include "acoustid-server.labels" . | nindent 8 }}
+        app.kubernetes.io/component: static
+    spec:
+      containers:
+        - name: static
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}-static"
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - name: static
+              containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /_health/ready
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          {{- if .Values.static.resources }}
+          resources:
+            {{- toYaml .Values.static.resources | nindent 12 }}
+          {{- end }}
