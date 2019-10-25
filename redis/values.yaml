@@ -210,6 +210,9 @@ exporter:
   # cpu/memory resource limits/requests
   resources: {}
 
+  # pod annotations to announce the exporter
+  # annotations: {}
+
   # Additional args for redis exporter
   extraArgs: {}
 

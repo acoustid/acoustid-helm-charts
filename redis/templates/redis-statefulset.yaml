@@ -19,14 +19,18 @@ spec:
     metadata:
       annotations:
         checksum/init-config: {{ include (print $.Template.BasePath "/redis-configmap.yaml") . | sha256sum }}
-      {{- if .Values.podAnnotations }}
-{{ toYaml .Values.podAnnotations | indent 8 }}
-      {{- end }}
-      {{- if .Values.exporter.enabled }}
-        prometheus.io/port: "{{ .Values.exporter.port }}"
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.exporter.enabled }}
+        {{- if .Values.exporter.annotations  }}
+        {{- toYaml .Values.exporter.annotations | nindent 8 }}
+        {{- else }}
         prometheus.io/scrape: "true"
-        prometheus.io/path: {{ .Values.exporter.scrapePath }}
-      {{- end }}
+        prometheus.io/port: {{ .Values.exporter.port | quote }}
+        prometheus.io/path: {{ .Values.exporter.scrapePath | quote }}
+        {{- end }}
+        {{- end }}
       labels:
         {{- include "redis.labels" . | nindent 8 }}
         app.kubernetes.io/component: redis
