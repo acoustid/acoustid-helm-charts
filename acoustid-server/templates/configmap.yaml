@@ -7,7 +7,7 @@ metadata:
 data:
   acoustid.conf: |
     [database]
-    two_phase_commit=true
+    two_phase_commit=false
 
     [database:app]
     name={{ .Values.database.app.name }}
