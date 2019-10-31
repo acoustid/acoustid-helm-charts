@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "acoustid-server.fullname" . }}-import
+  labels:
+    {{- include "acoustid-server.labels" . | nindent 4 }}
+    app.kubernetes.io/component: import
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "acoustid-server.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: import
+  template:
+    metadata:
+      labels:
+        {{- include "acoustid-server.labels" . | nindent 8 }}
+        app.kubernetes.io/component: import
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: import
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}-import"
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          env:
+            {{- include "acoustid-server.sharedEnv" . | nindent 12 }}
+          volumeMounts:
+            {{- include "acoustid-server.sharedVolumeMounts" . | nindent 12 }}
+          {{- if .Values.import.resources }}
+          resources:
+            {{- toYaml .Values.import.resources | nindent 12 }}
+          {{- end }}
+      volumes:
+        {{- include "acoustid-server.sharedVolumes" . | nindent 8 }}

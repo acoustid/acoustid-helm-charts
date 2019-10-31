@@ -74,7 +74,7 @@ data:
     {{- end }}
 
     [cluster]
-    role=slave
+    role=master
     base_master_url=https://api.acoustid.org/
     secret=XXX
 
