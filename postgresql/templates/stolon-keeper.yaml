@@ -92,6 +92,8 @@ spec:
             - name: metrics
               containerPort: {{ .Values.metrics.port }}
           volumeMounts:
+            - name: shm
+              mountPath: /dev/shm
             - name: data
               mountPath: /data
             - name: config
@@ -136,6 +138,9 @@ spec:
         - name: data
           emptyDir: {}
 {{- end }}
+        - name: shm
+          emptyDir:
+            medium: Memory
         - name: superuser
           secret:
             secretName: {{ include "postgresql.superuserSecretName" . }}
