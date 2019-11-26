@@ -59,6 +59,8 @@ data:
         replication:
           username: '${PATRONI_REPLICATION_USERNAME}'
           password: '${PATRONI_REPLICATION_PASSWORD}'
+    watchdog:
+      mode: off
     EOS
 
     export KUBERNETES_NAMESPACE=$PATRONI_KUBERNETES_NAMESPACE
