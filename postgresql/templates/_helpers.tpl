@@ -1,5 +1,7 @@
 {{/* vim: set filetype=mustache: */}}
-
+{{/*
+Expand the name of the chart.
+*/}}
 {{- define "postgresql.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
@@ -29,32 +31,50 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
+Common labels
+*/}}
 {{- define "postgresql.labels" -}}
-app.kubernetes.io/name: {{ include "postgresql.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Values.labels -}}
-{{- toYaml .Values.labels | nindent 0 }}
-{{- end -}}
-{{- end -}}
-
-{{- define "postgresql.volumeClaimTemplateLabels" -}}
-app.kubernetes.io/name: {{ include "postgresql.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Values.labels -}}
-{{- toYaml .Values.labels | nindent 0 }}
-{{- end -}}
+helm.sh/chart: {{ include "postgresql.chart" . | quote }}
+{{ include "postgresql.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 {{- end -}}
 
-{{- define "postgresql.matchLabels" -}}
-app.kubernetes.io/name: {{ include "postgresql.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{/*
+Selector labels
+*/}}
+{{- define "postgresql.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "postgresql.name" . | quote }}
+app.kubernetes.io/instance: {{ .Release.Name | quote }}
+cluster-name: {{ include "postgresql.clusterName" . | quote }}
 {{- end -}}
 
+{{/*
+Selector labels in JSON format
+*/}}
+{{- define "postgresql.patroniSelectorLabelsInJSON" -}}
+{"app.kubernetes.io/name": {{ include "postgresql.name" . | quote}}, "cluster-name": {{ include "postgresql.clusterName" . | quote }}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use
+*/}}
 {{- define "postgresql.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
     {{ default (include "postgresql.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "postgresql.clusterName" -}}
+{{- if .Values.clusterName -}}
+{{ .Values.clusterName }}
+{{- else -}}
+{{ include "postgresql.fullname" . }}
 {{- end -}}
 {{- end -}}
 
@@ -74,11 +94,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 {{- end -}}
 
-{{- define "postgresql.dataVolumeName" -}}
-{{ include "postgresql.fullname" . }}-data
-{{- end -}}
-
-{{- define "postgresql.backupConfigSecretName" -}}
+{{- define "postgresql.backupSecretName" -}}
 {{ include "postgresql.fullname" . }}-backup
 {{- end -}}
 

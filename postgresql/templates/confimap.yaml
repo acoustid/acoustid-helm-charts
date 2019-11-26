@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "postgresql.fullname" . }}-scripts
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+data:
+  push-wal.sh: |
+    #!/usr/bin/env bash
+    {{ if .Values.backup.enabled }}
+    export PGUSER=$(cat "$PGUSERFILE")
+    export PGPASSWORD=$(cat "$PGPASSWORDFILE")
+    exec envdir /etc/wal-g.d/env wal-g wal-push $1
+    {{ end }}
+
+  push-backup.sh: |
+    #!/usr/bin/env bash
+    {{ if .Values.backup.enabled }}
+    export PGUSER=$(cat "$PGUSERFILE")
+    export PGPASSWORD=$(cat "$PGPASSWORDFILE")
+    exec envdir /etc/wal-g.d/env wal-g backup-push $PATRONI_POSTGRESQL_DATA_DIR
+    {{ end }}
+
+  patroni.sh: |
+    #!/usr/bin/env bash
+
+    PATRONI_SUPERUSER_USERNAME=$(cat "$PATRONI_SUPERUSER_USERNAME_FILE")
+    PATRONI_SUPERUSER_PASSWORD=$(cat "$PATRONI_SUPERUSER_PASSWORD_FILE")
+
+    PATRONI_REPLICATION_USERNAME=$(cat "$PATRONI_REPLICATION_USERNAME_FILE")
+    PATRONI_REPLICATION_PASSWORD=$(cat "$PATRONI_REPLICATION_PASSWORD_FILE")
+
+    cat > /tmp/patroni.yml <<EOS
+    bootstrap:
+      dcs:
+        postgresql:
+          use_pg_rewind: true
+          parameters:
+            archive_mode: "on"
+            archive_timeout: "300s"
+            archive_command: "/postgresql/scripts/push-wal.sh %p"
+      initdb:
+      - auth-host: md5
+      - auth-local: trust
+      - encoding: UTF8
+      - locale: en_US.UTF-8
+      - data-checksums
+      pg_hba:
+      - host all all 0.0.0.0/0 md5
+      - host replication ${PATRONI_REPLICATION_USERNAME} ${PATRONI_KUBERNETES_POD_IP}/16 md5
+    restapi:
+      connect_address: '${PATRONI_KUBERNETES_POD_IP}:8008'
+    postgresql:
+      connect_address: '${PATRONI_KUBERNETES_POD_IP}:5432'
+      authentication:
+        superuser:
+          username: '${PATRONI_SUPERUSER_USERNAME}'
+          password: '${PATRONI_SUPERUSER_PASSWORD}'
+        replication:
+          username: '${PATRONI_REPLICATION_USERNAME}'
+          password: '${PATRONI_REPLICATION_PASSWORD}'
+    EOS
+
+    export KUBERNETES_NAMESPACE=$PATRONI_KUBERNETES_NAMESPACE
+    export POD_NAME=$PATRONI_NAME
+
+    exec gosu postgres patroni /tmp/patroni.yml
