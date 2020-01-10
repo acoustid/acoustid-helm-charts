@@ -14,4 +14,4 @@ maintainers:
 name: sentry
 sources:
 - https://github.com/getsentry/sentry
-version: 3.0.2
+version: 3.2.0
