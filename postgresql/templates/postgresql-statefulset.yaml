@@ -6,6 +6,8 @@ metadata:
     {{- include "postgresql.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  updateStrategy:
+    {{- toYaml .Values.updateStrategy | nindent 4 }}
   serviceName: {{ .Chart.Name }}
   selector:
     matchLabels:
@@ -32,6 +34,16 @@ spec:
             - "dumb-init"
             - "--"
             - "/postgresql/scripts/patroni.sh"
+          readinessProbe:
+            exec:
+              command:
+                - "pg_isready"
+                - "-h"
+                - "localhost"
+                - "-U"
+                - "postgres"
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
           env:
             - name: PATRONI_SCOPE
               value: {{ include "postgresql.clusterName" . | quote }}
@@ -50,7 +62,7 @@ spec:
             - name: PATRONI_KUBERNETES_USE_ENDPOINTS
               value: "true"
             - name: PATRONI_KUBERNETES_LABELS
-              value: {{ include "postgresql.patroniSelectorLabelsInJSON" . | quote }}
+              value: {{ include "postgresql.clusterSelectorLabelsInJSON" . | quote }}
             - name: PATRONI_KUBERNETES_SCOPE_LABEL
               value: "cluster-name" 
             - name: PATRONI_KUBERNETES_ROLE_LABEL
@@ -103,6 +115,36 @@ spec:
               mountPath: /etc/secrets/postgresql/replication
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+{{ if .Values.exporter.enabled }}
+        - name: exporter
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/bin/bash"
+            - "-ec"
+            - |
+              export DATA_SOURCE_URI="$POD_IP:5432/postgres?sslmode=disable"
+              exec gosu postgres /opt/postgres_exporter/bin/postgres_exporter
+          env:
+            - name: PG_EXPORTER_WEB_LISTEN_ADDRESS
+              value: "0.0.0.0:{{ .Values.exporter.port }}"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: DATA_SOURCE_USER_FILE
+              value: /etc/secrets/postgresql/superuser/username
+            - name: DATA_SOURCE_PASS_FILE
+              value: /etc/secrets/postgresql/superuser/password
+          volumeMounts:
+            - name: superuser
+              mountPath: /etc/secrets/postgresql/superuser
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: {{ .Values.exporter.port }}
+            initialDelaySeconds: 10
+{{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

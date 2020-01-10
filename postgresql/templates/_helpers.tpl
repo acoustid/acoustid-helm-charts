@@ -52,10 +52,12 @@ app.kubernetes.io/instance: {{ .Release.Name | quote }}
 cluster-name: {{ include "postgresql.clusterName" . | quote }}
 {{- end -}}
 
-{{/*
-Selector labels in JSON format
-*/}}
-{{- define "postgresql.patroniSelectorLabelsInJSON" -}}
+{{- define "postgresql.clusterSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "postgresql.name" . | quote }}
+cluster-name: {{ include "postgresql.clusterName" . | quote }}
+{{- end -}}
+
+{{- define "postgresql.clusterSelectorLabelsInJSON" -}}
 {"app.kubernetes.io/name": {{ include "postgresql.name" . | quote}}, "cluster-name": {{ include "postgresql.clusterName" . | quote }}}
 {{- end -}}
 
@@ -79,25 +81,29 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "postgresql.superuserSecretName" -}}
-{{- if .Values.superuser.secretName -}}
-{{ .Values.superuser.secretName }}
+{{- if .Values.users.superuser.secretName -}}
+{{ .Values.users.superuser.secretName }}
 {{- else -}}
 {{ include "postgresql.fullname" . }}-superuser
 {{- end -}}
 {{- end -}}
 
 {{- define "postgresql.replicationSecretName" -}}
-{{- if .Values.replication.secretName -}}
-{{ .Values.replication.secretName }}
+{{- if .Values.users.replication.secretName -}}
+{{ .Values.users.replication.secretName }}
 {{- else -}}
 {{ include "postgresql.fullname" . }}-replication
 {{- end -}}
 {{- end -}}
 
 {{- define "postgresql.backupSecretName" -}}
+{{- if .Values.backup.secretName -}}
+{{ .Values.backup.secretName }}
+{{- else -}}
 {{ include "postgresql.fullname" . }}-backup
+{{- end -}}
 {{- end -}}
 
 {{- define "postgresql.backupPath" -}}
-s3://{{ .Values.backup.bucket }}/{{ .Values.backup.prefix }}/{{ .Release.Name }}
+s3://{{ .Values.backup.bucket }}/{{ .Values.backup.prefix }}/{{ default .Release.Name .Values.backup.name }}
 {{- end -}}

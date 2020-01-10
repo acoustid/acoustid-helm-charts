@@ -29,15 +29,28 @@ persistence:
   storageClassName:
   accessMode: ReadWriteOnce
 
-superuser:
-  # secretName:
-  username: postgres
-  password:
+bootstrap: {}
 
-replication:
-  # secretName:
-  username: replication
-  password:
+dcs:
+  postgresql:
+    use_pg_rewind: true
+    parameters:
+      archive_mode: "on"
+      archive_timeout: "300s"
+      archive_command: "/postgresql/scripts/push-wal.sh %p"
+
+updateStrategy:
+  type: OnDelete
+
+users:
+  superuser:
+    # secretName:
+    username: postgres
+    password:
+  replication:
+    # secretName:
+    username: replication
+    password:
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -51,6 +64,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  create: true
   type: ClusterIP
   port: 5432
 
@@ -75,8 +89,13 @@ backup:
   enabled: false
   bucket:
   prefix:
+  # name: 
   aws_access_key_id:
   aws_secret_access_key:
+
+exporter:
+  enabled: false
+  port: 9187
 
 nodeSelector: {}
 

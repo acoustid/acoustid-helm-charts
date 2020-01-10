@@ -1,7 +1,8 @@
+{{ if .Values.service.create }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "postgresql.fullname" . }}
+  name: {{ include "postgresql.clusterName" . }}
   labels:
     {{- include "postgresql.labels" . | nindent 4 }}
 spec:
@@ -15,7 +16,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "postgresql.fullname" . }}-replicas
+  name: {{ include "postgresql.clusterName" . }}-replicas
   labels:
     {{- include "postgresql.labels" . | nindent 4 }}
 spec:
@@ -26,13 +27,13 @@ spec:
       protocol: TCP
       name: postgresql
   selector:
-    {{- include "postgresql.selectorLabels" . | nindent 4 }}
+    {{- include "postgresql.clusterSelectorLabels" . | nindent 4 }}
     role: replica
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "postgresql.fullname" . }}-all
+  name: {{ include "postgresql.clusterName" . }}-all
   labels:
     {{- include "postgresql.labels" . | nindent 4 }}
 spec:
@@ -43,4 +44,5 @@ spec:
       protocol: TCP
       name: postgresql
   selector:
-    {{- include "postgresql.selectorLabels" . | nindent 4 }}
+    {{- include "postgresql.clusterSelectorLabels" . | nindent 4 }}
+{{ end }}
