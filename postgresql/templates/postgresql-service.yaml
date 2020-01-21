@@ -19,6 +19,7 @@ metadata:
   name: {{ include "postgresql.clusterName" . }}-replicas
   labels:
     {{- include "postgresql.labels" . | nindent 4 }}
+    role: replica
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -36,6 +37,7 @@ metadata:
   name: {{ include "postgresql.clusterName" . }}-all
   labels:
     {{- include "postgresql.labels" . | nindent 4 }}
+    role: all
 spec:
   type: {{ .Values.service.type }}
   ports:

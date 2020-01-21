@@ -77,6 +77,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   mountPath: /etc/secrets/acoustid
 {{- end -}}
 
+{{- define "acoustid-server.appSecretName" -}}
+{{- if .Values.appSecretName -}}
+{{- .Values.appSecretName -}}
+{{- else -}}
+{{- include "acoustid-server.fullname" . }}-secrets
+{{- end -}}
+{{- end -}}
+
 {{- define "acoustid-server.sharedVolumes" -}}
 - name: postgresql-user-acoustid
   secret:
@@ -86,5 +94,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     name: {{ include "acoustid-server.fullname" . }}-config
 - name: acoustid-secrets
   secret:
-    secretName: {{ include "acoustid-server.fullname" . }}-secrets
+    secretName: {{ include "acoustid-server.appSecretName" . }}
 {{- end -}}

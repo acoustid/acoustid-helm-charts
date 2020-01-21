@@ -35,5 +35,5 @@ spec:
   selector:
     {{- include "redis.matchLabels" $root | nindent 4 }}
     app.kubernetes.io/component: redis
-    statefulset.kubernetes.io/pod-name: {{ $fullName }}-server-{{ $i }}
+    statefulset.kubernetes.io/pod-name: {{ $fullName }}-{{ $i }}
 {{- end }}

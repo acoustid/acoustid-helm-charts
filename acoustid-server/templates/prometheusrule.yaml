@@ -1,0 +1,55 @@
+{{ if and .Values.ingress.web.enabled .Values.ingress.web.createPrometheusRule }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Values.ingress.web.name }}
+  labels:
+    {{- include "acoustid-server.labels" . | nindent 4 }}
+spec:
+  groups:
+    - name: {{ .Values.ingress.web.name }}
+      rules:
+        - alert: AcoustidWebIngressRequestsFailing
+          expr:
+            sum(rate(nginx_ingress_controller_requests{namespace="{{ .Release.Namespace }}", ingress="{{ .Values.ingress.web.name }}", status=~"5.*"}[5m])) by (namespace, ingress, service) > 0.01
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            message: AcoustID web requests are failing with error 5xx.
+{{ end }}
+{{ if and .Values.ingress.api.enabled .Values.ingress.api.createPrometheusRule }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Values.ingress.api.name }}
+  labels:
+    {{- include "acoustid-server.labels" . | nindent 4 }}
+spec:
+  groups:
+    - name: {{ .Values.ingress.api.name }}
+      rules:
+        - alert: AcoustidApiIngressRequestsFailing
+          expr:
+            sum(rate(nginx_ingress_controller_requests{namespace="{{ .Release.Namespace }}", ingress="{{ .Values.ingress.api.name }}", status=~"5.*"}[5m])) by (namespace, ingress, service) > 0.01
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            message: AcoustID API requests are failing with error 5xx.
+#        - alert: AcoustidApiIngressRequestsRateLimited
+#          expr:
+#            sum(rate(nginx_ingress_controller_requests{namespace="{{ .Release.Namespace }}", ingress="{{ .Values.ingress.api.name }}", status=~"5.*"}[5m])) by (namespace, ingress, service) > 0.01
+##            100 * (
+##              sum(rate(nginx_ingress_controller_requests{namespace="{{ .Release.Namespace }}", ingress="{{ .Values.ingress.api.name }}", status="429"}[5m])) by (namespace, ingress)
+##                /
+##              sum(rate(nginx_ingress_controller_requests{namespace="{{ .Release.Namespace }}", ingress="{{ .Values.ingress.api.name }}"}[5m])) by (namespace, ingress)
+##            ) > 1
+#          for: 15m
+#          labels:
+#            severity: warning
+#          annotations:
+#            message: {{`{{ printf "%.2f" $value }}`}}% of AcoustID API requests are being rate-limited.
+{{ end }}

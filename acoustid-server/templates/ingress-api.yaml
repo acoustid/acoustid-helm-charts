@@ -1,0 +1,31 @@
+{{ if .Values.ingress.api.enabled }}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+{{ if .Values.ingress.api.canary.enabled }}
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: {{ .Values.ingress.api.canary.weight | quote }}
+{{ end }}
+    nginx.ingress.kubernetes.io/client-body-buffer-size: "1M"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: {{ .Values.ingress.api.name | quote }}
+spec:
+  rules:
+{{ range .Values.ingress.api.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ include "acoustid-server.fullname" $ }}-api
+              servicePort: 3031
+            path: /
+{{ end }}
+  tls:
+    - hosts:
+{{ range .Values.ingress.api.hosts }}
+        - {{ . | quote }}
+{{ end }}
+      secretName: acoustid-api-cert
+{{ end }}

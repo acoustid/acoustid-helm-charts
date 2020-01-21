@@ -93,9 +93,23 @@ backup:
   aws_access_key_id:
   aws_secret_access_key:
 
-exporter:
+metrics:
   enabled: false
-  port: 9187
+
+  postgresExporter:
+    image:
+      repository: quay.io/acoustid/postgresql
+      tag: master
+      pullPolicy: Always
+
+  patroniExporter:
+    image:
+      repository: quay.io/acoustid/patroni-exporter
+      tag: master
+      pullPolicy: Always
+
+  createPodMonitor: false
+  createPrometheusRule: false
 
 nodeSelector: {}
 

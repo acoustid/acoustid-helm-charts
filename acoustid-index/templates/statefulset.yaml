@@ -18,13 +18,19 @@ spec:
         {{- include "acoustid-index.annotations" . | nindent 8 }}
         {{- include "acoustid-index.metricsAnnotations" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: chown-data-dir
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /var/lib/acoustid-index"]
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/acoustid-index
       containers:
         - name: index
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           command:
             - "catchsegv"
-          args:
             - "fpi-server"
             - "--directory"
             - "/var/lib/acoustid-index"
@@ -53,6 +59,9 @@ spec:
             tcpSocket:
               port: 6080
             initialDelaySeconds: 5
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

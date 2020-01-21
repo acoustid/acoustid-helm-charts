@@ -95,8 +95,8 @@ spec:
             - name: postgresql
               containerPort: 5432
               protocol: TCP
-            - name: http
-              containerPort: 8080
+            - name: patroni
+              containerPort: 8008
               protocol: TCP
           volumeMounts:
             - name: dshm
@@ -115,10 +115,12 @@ spec:
               mountPath: /etc/secrets/postgresql/replication
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-{{ if .Values.exporter.enabled }}
+
+{{ if .Values.metrics.enabled }}
+
         - name: exporter
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.metrics.postgresExporter.image.repository }}:{{ .Values.metrics.postgresExporter.image.tag }}
+          imagePullPolicy: {{ .Values.metrics.postgresExporter.image.pullPolicy }}
           command:
             - "/bin/bash"
             - "-ec"
@@ -127,7 +129,7 @@ spec:
               exec gosu postgres /opt/postgres_exporter/bin/postgres_exporter
           env:
             - name: PG_EXPORTER_WEB_LISTEN_ADDRESS
-              value: "0.0.0.0:{{ .Values.exporter.port }}"
+              value: "0.0.0.0:9187"
             - name: POD_IP
               valueFrom:
                 fieldRef:
@@ -136,15 +138,45 @@ spec:
               value: /etc/secrets/postgresql/superuser/username
             - name: DATA_SOURCE_PASS_FILE
               value: /etc/secrets/postgresql/superuser/password
+          ports:
+            - name: metrics
+              containerPort: 9187
+              protocol: TCP
           volumeMounts:
             - name: superuser
               mountPath: /etc/secrets/postgresql/superuser
           readinessProbe:
             httpGet:
-              path: /metrics
-              port: {{ .Values.exporter.port }}
-            initialDelaySeconds: 10
+              path: /
+              port: 9187
+            initialDelaySeconds: 5
+
+        - name: patroni-exporter
+          image: {{ .Values.metrics.patroniExporter.image.repository }}:{{ .Values.metrics.patroniExporter.image.tag }}
+          imagePullPolicy: {{ .Values.metrics.patroniExporter.image.pullPolicy }}
+          command:
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/bin/sh"
+            - "-c"
+            - "exec /app/patroni_exporter.py -u http://$POD_IP:8008/patroni"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - name: patroni-metrics
+              containerPort: 9547
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9547
+            initialDelaySeconds: 5
+
 {{ end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

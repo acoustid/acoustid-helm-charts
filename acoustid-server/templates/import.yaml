@@ -1,3 +1,4 @@
+{{ if .Values.import.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -33,3 +34,4 @@ spec:
           {{- end }}
       volumes:
         {{- include "acoustid-server.sharedVolumes" . | nindent 8 }}
+{{ end }}

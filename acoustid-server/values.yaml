@@ -4,22 +4,56 @@ image:
   pullPolicy: Always
 
 api:
+  enabled: true
   replicas: 6
   resources: {}
 
 web:
+  enabled: true
   replicas: 3
   resources: {}
 
 cron:
+  enabled: true
   resources: {}
 
 import:
+  enabled: true
   resources: {}
 
 static:
+  enabled: true
   replicas: 3
   resources: {}
+
+ingress:
+
+  web:
+    enabled: false
+    name: acoustid-web
+    hosts:
+      - acoustid.org
+      - www.acoustid.org
+    canary:
+      enabled: false
+      weight: 0
+    createPrometheusRule: false
+
+  api:
+    enabled: false
+    name: acoustid-api
+    hosts:
+      - api.acoustid.org
+    canary:
+      enabled: false
+      weight: 0
+    createPrometheusRule: false
+
+  data:
+    enabled: false
+    name: acoustid-data
+    hosts:
+      - data.acoustid.org
 
 database:
   userSecretName: acoustid-postgresql-user 
@@ -75,6 +109,8 @@ gunicorn:
   threads: 1
 
 labels: {}
+
+# appSecretName: 
 
 # nameOverride:
 # fullnameOverride:

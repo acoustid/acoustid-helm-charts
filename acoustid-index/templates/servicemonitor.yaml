@@ -1,0 +1,19 @@
+{{ if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "acoustid-index.fullname" . }}
+  labels:
+    {{- include "acoustid-index.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "acoustid-index.matchLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - port: metrics
+      path: /metrics
+{{ end }}
+

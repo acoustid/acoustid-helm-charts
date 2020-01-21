@@ -9,10 +9,14 @@ metrics:
   enabled: false
   port: 6081
   annotations: {}
-    # prometheus.io/scrape: "true"
-    # prometheus.io/path: "/metrics"
-    # prometheus.io/port: "6081"
-    # field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":6081,"schema":"HTTP"}]'
+
+  # Create ServiceMonitor for prometheus-operator
+  serviceMonitor:
+    enabled: false
+
+  # Set annotations for Rancher
+  # annotations:
+  #   field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":6081,"schema":"HTTP"}]'
 
 updater:
   enabled: false
