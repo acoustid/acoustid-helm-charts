@@ -7,3 +7,4 @@ appVersion: 2021.09.01
 maintainers:
   - name: Lukas Lalinsky
     email: lukas@acoustid.org
+    url: https://acoustid.org
