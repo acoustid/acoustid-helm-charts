@@ -12,9 +12,8 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/instance: acoustid-server-web
-      app.kubernetes.io/name: acoustid-server-web
-      app.kubernetes.io/part-of: acoustid
+      {{- include "acoustid-server.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: web
   strategy:
     type: RollingUpdate
     rollingUpdate:
