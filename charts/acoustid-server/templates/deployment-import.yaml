@@ -42,35 +42,17 @@ spec:
             - name: ACOUSTID_INDEX_PORT
               value: "6080"
           volumeMounts:
-            - mountPath: /etc/secrets/redis
-              name: redis-password
-            - mountPath: /etc/secrets/postgresql/acoustid
-              name: postgresql-user-acoustid
             - mountPath: /etc/acoustid
               name: acoustid-config
-            - mountPath: /etc/secrets/acoustid
-              name: acoustid-secrets
           resources:
             {{- toYaml .Values.api.resources | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
       volumes:
-        - name: postgresql-user-acoustid
-          secret:
+        - name: acoustid-config
+          configMap:
             defaultMode: 420
-            secretName: postgresql-user-acoustid
-        - name: redis-password
-          secret:
-            defaultMode: 420
-            secretName: redis-password
-        - configMap:
-            defaultMode: 420
-            name: acoustid-server-config
-          name: acoustid-config
-        - name: acoustid-secrets
-          secret:
-            defaultMode: 420
-            secretName: acoustid-server-secrets
+            name: {{ include "acoustid-server.fullname" . }}-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

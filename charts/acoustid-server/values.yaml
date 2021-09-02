@@ -100,3 +100,56 @@ import:
   replicaCount: ~
 
   resources: {}
+
+database:
+  userSecretName: acoustid-postgresql-user
+  app:
+    name: acoustid
+    readWrite:
+      host: postgresql-app
+      port: 5432
+    readOnly:
+      host: postgresql-app-all
+      port: 5432
+  fingerprint:
+    name: acoustid
+    readWrite:
+      host: postgresql-fingerprint
+      port: 5432
+    readOnly:
+      host: postgresql-fingerprint-all
+      port: 5432
+  ingest:
+    name: acoustid
+    readWrite:
+      host: postgresql-ingest
+      port: 5432
+    readOnly:
+      host: postgresql-ingest-all
+      port: 5432
+  musicbrainz:
+    name: musicbrainz
+    readWrite:
+      host: postgresql-musicbrainz
+      port: 5432
+    readOnly:
+      host: postgresql-musicbrainz-all
+      port: 5432
+
+index:
+  host: acoustid-index
+  port: 6080
+
+redis:
+  host: redis
+  port: 6379
+  sentinel: false
+  cluster: acoustid
+
+ratelimits:
+  global: 1000
+
+gunicorn:
+  timeout: 60
+  workers: 2
+  threads: 1
