@@ -93,3 +93,10 @@ cron:
   enabled: true
 
   resources: {}
+
+import:
+  enabled: true
+
+  replicaCount: ~
+
+  resources: {}
