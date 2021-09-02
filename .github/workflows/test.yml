@@ -5,6 +5,10 @@ on: pull_request
 jobs:
   lint-test:
     runs-on: ubuntu-latest
+
+    env:
+      CT_TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -33,7 +37,7 @@ jobs:
           fi
 
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch=${{ github.event.pull_request.base.ref }}
+        run: ct lint
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.2.0
