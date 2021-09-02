@@ -7,8 +7,8 @@ metadata:
     {{- include "acoustid-server.labels" . | nindent 4 }}
     app.kubernetes.io/component: api
 spec:
-  {{- if .Values.api.replicas }}
-  replicas: {{ .Values.api.replicas }}
+  {{- if .Values.api.replicaCount }}
+  replicas: {{ .Values.api.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
