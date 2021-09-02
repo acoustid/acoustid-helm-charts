@@ -5,6 +5,6 @@ type: application
 version: 0.2.0
 appVersion: 2021.09.01
 maintainers:
-  - name: Lukas Lalinsky
+  - name: lalinsky
     email: lukas@acoustid.org
     url: https://acoustid.org
