@@ -34,10 +34,6 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-service:
-  type: ClusterIP
-  port: 80
-
 ingress:
   enabled: false
   annotations: {}
@@ -51,13 +47,6 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
 nodeSelector: {}
 
 tolerations: []
@@ -66,9 +55,23 @@ affinity: {}
 
 api:
   enabled: true
+
   replicaCount: ~
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
   resources: {}
 
 cron:
   enabled: true
+
   resources: {}
