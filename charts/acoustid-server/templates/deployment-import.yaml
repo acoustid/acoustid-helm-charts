@@ -15,9 +15,6 @@ spec:
       {{- include "acoustid-server.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: import
   strategy:
-    rollingUpdate:
-      maxSurge: 0%
-      maxUnavailable: 100%
     type: Recreate
   template:
     metadata:
