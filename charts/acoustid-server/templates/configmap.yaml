@@ -11,59 +11,59 @@ data:
 
     [database:app]
     name={{ .Values.database.app.name }}
-    host={{ .Values.database.app.readWrite.host }}
-    port={{ .Values.database.app.readWrite.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.app.primary.host }}
+    port={{ .Values.database.app.primary.port }}
+    user={{ or .Values.database.app.primary.user (or .Values.database.app.user "acoustid") }}
+    password={{ or .Values.database.app.primary.user (or .Values.database.app.user "acoustid") }}
 
     [database:app:ro]
     name={{ .Values.database.app.name }}
-    host={{ .Values.database.app.readOnly.host }}
-    port={{ .Values.database.app.readOnly.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.app.replica.host }}
+    port={{ .Values.database.app.replica.port }}
+    user={{ or .Values.database.app.replica.user (or .Values.database.app.user "acoustid") }}
+    password={{ or .Values.database.app.replica.user (or .Values.database.app.user "acoustid") }}
 
     [database:fingerprint]
     name={{ .Values.database.fingerprint.name }}
-    host={{ .Values.database.fingerprint.readWrite.host }}
-    port={{ .Values.database.fingerprint.readWrite.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.fingerprint.primary.host }}
+    port={{ .Values.database.fingerprint.primary.port }}
+    user={{ or .Values.database.fingerprint.primary.user (or .Values.database.fingerprint.user "acoustid") }}
+    password={{ or .Values.database.fingerprint.primary.user (or .Values.database.fingerprint.user "acoustid") }}
 
     [database:fingerprint:ro]
     name={{ .Values.database.fingerprint.name }}
-    host={{ .Values.database.fingerprint.readOnly.host }}
-    port={{ .Values.database.fingerprint.readOnly.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.fingerprint.replica.host }}
+    port={{ .Values.database.fingerprint.replica.port }}
+    user={{ or .Values.database.fingerprint.replica.user (or .Values.database.fingerprint.user "acoustid") }}
+    password={{ or .Values.database.fingerprint.replica.user (or .Values.database.fingerprint.user "acoustid") }}
 
     [database:ingest]
     name={{ .Values.database.ingest.name }}
-    host={{ .Values.database.ingest.readWrite.host }}
-    port={{ .Values.database.ingest.readWrite.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.ingest.primary.host }}
+    port={{ .Values.database.ingest.primary.port }}
+    user={{ or .Values.database.ingest.primary.user (or .Values.database.ingest.user "acoustid") }}
+    password={{ or .Values.database.ingest.primary.user (or .Values.database.ingest.user "acoustid") }}
 
     [database:ingest:ro]
     name={{ .Values.database.ingest.name }}
-    host={{ .Values.database.ingest.readOnly.host }}
-    port={{ .Values.database.ingest.readOnly.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.ingest.replica.host }}
+    port={{ .Values.database.ingest.replica.port }}
+    user={{ or .Values.database.ingest.replica.user (or .Values.database.ingest.user "acoustid") }}
+    password={{ or .Values.database.ingest.replica.user (or .Values.database.ingest.user "acoustid") }}
 
     [database:musicbrainz]
     name={{ .Values.database.musicbrainz.name }}
-    host={{ .Values.database.musicbrainz.readWrite.host }}
-    port={{ .Values.database.musicbrainz.readWrite.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.musicbrainz.primary.host }}
+    port={{ .Values.database.musicbrainz.primary.port }}
+    user={{ or .Values.database.musicbrainz.primary.user (or .Values.database.musicbrainz.user "acoustid") }}
+    password={{ or .Values.database.musicbrainz.primary.user (or .Values.database.musicbrainz.user "acoustid") }}
 
     [database:musicbrainz:ro]
     name={{ .Values.database.musicbrainz.name }}
-    host={{ .Values.database.musicbrainz.readOnly.host }}
-    port={{ .Values.database.musicbrainz.readOnly.port }}
-    user_file=/etc/secrets/postgresql/acoustid/username
-    password_file=/etc/secrets/postgresql/acoustid/password
+    host={{ .Values.database.musicbrainz.replica.host }}
+    port={{ .Values.database.musicbrainz.replica.port }}
+    user={{ or .Values.database.musicbrainz.replica.user (or .Values.database.musicbrainz.user "acoustid") }}
+    password={{ or .Values.database.musicbrainz.replica.user (or .Values.database.musicbrainz.user "acoustid") }}
 
     [redis]
     host={{ .Values.redis.host }}

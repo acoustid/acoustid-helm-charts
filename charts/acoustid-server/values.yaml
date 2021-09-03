@@ -26,13 +26,13 @@ podAnnotations: {}
 podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
 
 ingress:
   enabled: false
@@ -102,40 +102,55 @@ import:
   resources: {}
 
 database:
-  userSecretName: acoustid-postgresql-user
   app:
     name: acoustid
-    readWrite:
+    primary:
       host: postgresql-app
       port: 5432
-    readOnly:
+      # user: acoustid
+      # password: acoustid
+    replica:
       host: postgresql-app-all
       port: 5432
+      # user: acoustid
+      # password: acoustid
   fingerprint:
     name: acoustid
-    readWrite:
+    primary:
       host: postgresql-fingerprint
       port: 5432
-    readOnly:
+      # user: acoustid
+      # password: acoustid
+    replica:
       host: postgresql-fingerprint-all
       port: 5432
+      # user: acoustid
+      # password: acoustid
   ingest:
     name: acoustid
-    readWrite:
+    primary:
       host: postgresql-ingest
       port: 5432
-    readOnly:
+      # user: acoustid
+      # password: acoustid
+    replica:
       host: postgresql-ingest-all
       port: 5432
+      # user: acoustid
+      # password: acoustid
   musicbrainz:
     name: musicbrainz
-    readWrite:
+    primary:
       host: postgresql-musicbrainz
       port: 5432
-    readOnly:
+      # user: acoustid
+      # password: acoustid
+    replica:
       host: postgresql-musicbrainz-all
       port: 5432
-
+      # user: acoustid
+      # password: acoustid
+ 
 index:
   host: acoustid-index
   port: 6080
