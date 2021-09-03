@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "acoustid-server.fullname" . }}-config
+  labels:
+    {{- include "acoustid-server.labels" . | nindent 4 }}
+data:
+  acoustid.conf: |
+    [database]
+    two_phase_commit=false
+
+    [database:app]
+    name={{ .Values.database.app.name }}
+    host={{ .Values.database.app.primary.host }}
+    port={{ .Values.database.app.primary.port }}
+    user={{ or .Values.database.app.primary.user (or .Values.database.app.user "acoustid") }}
+    password={{ or .Values.database.app.primary.user (or .Values.database.app.user "acoustid") }}
+
+    [database:app:ro]
+    name={{ .Values.database.app.name }}
+    host={{ .Values.database.app.replica.host }}
+    port={{ .Values.database.app.replica.port }}
+    user={{ or .Values.database.app.replica.user (or .Values.database.app.user "acoustid") }}
+    password={{ or .Values.database.app.replica.user (or .Values.database.app.user "acoustid") }}
+
+    [database:fingerprint]
+    name={{ .Values.database.fingerprint.name }}
+    host={{ .Values.database.fingerprint.primary.host }}
+    port={{ .Values.database.fingerprint.primary.port }}
+    user={{ or .Values.database.fingerprint.primary.user (or .Values.database.fingerprint.user "acoustid") }}
+    password={{ or .Values.database.fingerprint.primary.user (or .Values.database.fingerprint.user "acoustid") }}
+
+    [database:fingerprint:ro]
+    name={{ .Values.database.fingerprint.name }}
+    host={{ .Values.database.fingerprint.replica.host }}
+    port={{ .Values.database.fingerprint.replica.port }}
+    user={{ or .Values.database.fingerprint.replica.user (or .Values.database.fingerprint.user "acoustid") }}
+    password={{ or .Values.database.fingerprint.replica.user (or .Values.database.fingerprint.user "acoustid") }}
+
+    [database:ingest]
+    name={{ .Values.database.ingest.name }}
+    host={{ .Values.database.ingest.primary.host }}
+    port={{ .Values.database.ingest.primary.port }}
+    user={{ or .Values.database.ingest.primary.user (or .Values.database.ingest.user "acoustid") }}
+    password={{ or .Values.database.ingest.primary.user (or .Values.database.ingest.user "acoustid") }}
+
+    [database:ingest:ro]
+    name={{ .Values.database.ingest.name }}
+    host={{ .Values.database.ingest.replica.host }}
+    port={{ .Values.database.ingest.replica.port }}
+    user={{ or .Values.database.ingest.replica.user (or .Values.database.ingest.user "acoustid") }}
+    password={{ or .Values.database.ingest.replica.user (or .Values.database.ingest.user "acoustid") }}
+
+    [database:musicbrainz]
+    name={{ .Values.database.musicbrainz.name }}
+    host={{ .Values.database.musicbrainz.primary.host }}
+    port={{ .Values.database.musicbrainz.primary.port }}
+    user={{ or .Values.database.musicbrainz.primary.user (or .Values.database.musicbrainz.user "acoustid") }}
+    password={{ or .Values.database.musicbrainz.primary.user (or .Values.database.musicbrainz.user "acoustid") }}
+
+    [database:musicbrainz:ro]
+    name={{ .Values.database.musicbrainz.name }}
+    host={{ .Values.database.musicbrainz.replica.host }}
+    port={{ .Values.database.musicbrainz.replica.port }}
+    user={{ or .Values.database.musicbrainz.replica.user (or .Values.database.musicbrainz.user "acoustid") }}
+    password={{ or .Values.database.musicbrainz.replica.user (or .Values.database.musicbrainz.user "acoustid") }}
+
+    [redis]
+    host={{ .Values.redis.host }}
+    port={{ .Values.redis.port }}
+    sentinel={{ .Values.redis.sentinel }}
+    {{- if .Values.redis.sentinel }}
+    cluster={{ .Values.redis.cluster }}
+    {{- end }}
+
+    [cluster]
+    role=master
+    base_master_url=https://api.acoustid.org/
+    secret=XXX
+
+    [logging]
+    level=INFO
+
+    [website]
+    base_url=http://acoustid.org/
+    base_https_url=https://acoustid.org/
+    secret=XXX
+    mb_oauth_client_id=XXX
+    mb_oauth_client_secret=XXX
+
+    [uwsgi]
+    workers=2
+    harakiri=120
+    http_timeout=90
+    http_connect_timeout=10
+    post_buffering=0
+    buffer_size=65536
+    offload_threads=1
+
+    [gunicorn]
+    timeout={{ .Values.gunicorn.timeout }}
+    workers={{ .Values.gunicorn.workers }}
+    threads={{ .Values.gunicorn.threads }}
+
+    [rate_limiter]
+    {{- range $key, $val := .Values.ratelimits }}
+    {{ $key }}={{ $val }}
+    {{- end }}
