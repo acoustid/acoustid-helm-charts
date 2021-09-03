@@ -1,4 +1,4 @@
-# Collection of Helm charts for running AcoustID in production
+# Helm charts for running AcoustID on Kubernetes
 
 ## Usage
 
