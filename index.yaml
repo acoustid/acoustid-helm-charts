@@ -15,4 +15,19 @@ entries:
     urls:
     - https://github.com/acoustid/acoustid-helm-charts/releases/download/acoustid-server-0.2.0/acoustid-server-0.2.0.tgz
     version: 0.2.0
-generated: "2021-09-03T15:02:41.579489422Z"
+  mbslave:
+  - apiVersion: v2
+    appVersion: 25.0.3
+    created: "2021-09-06T18:55:23.319392294Z"
+    description: MusicBrainz database replica update process
+    digest: e330bb5057ca71e3cbf0c60dee5dd48055488132c3d7320f5d725c9e6b1cdb2f
+    maintainers:
+    - email: lukas@acoustid.org
+      name: lalinsky
+      url: https://acoustid.org
+    name: mbslave
+    type: application
+    urls:
+    - https://github.com/acoustid/acoustid-helm-charts/releases/download/mbslave-0.1.0/mbslave-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-09-06T18:55:23.319397094Z"
