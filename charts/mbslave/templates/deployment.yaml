@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mbslave.fullname" . }}
+  labels:
+    {{- include "mbslave.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "mbslave.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mbslave.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mbslave.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /usr/local/bin/mbslave
+            - sync
+            - -r
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "true"
+            - name: MBSLAVE_DB_NAME
+              value: {{ .Values.database.name }}
+            - name: MBSLAVE_DB_HOST
+              value: {{ .Values.database.host }}
+            {{- if and .Values.database.existingSecret .Values.database.userKey }}
+            - name: MBSLAVE_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingSecret }}
+                  key: {{ .Values.database.userKey }}
+            {{- end }}
+            {{- if and .Values.database.existingSecret .Values.database.passwordKey }}
+            - name: MBSLAVE_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingSecret }}
+                  key: {{ .Values.database.passwordKey }}
+            {{- end }}
+            {{- if and .Values.musicbrainzToken.existingSecret .Values.musicbrainzToken.tokenKey }}
+            - name: MBSLAVE_MUSICBRAINZ_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.musicbrainzToken.existingSecret }}
+                  key: {{ .Values.musicbrainzToken.tokenKey }}
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
