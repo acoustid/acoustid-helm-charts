@@ -46,7 +46,6 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - catchsegv
             - fpi-server
             - --directory
             - /var/lib/acoustid-index
@@ -121,8 +120,8 @@ spec:
                   key: {{ .Values.updater.database.passwordKey }}
             {{- end }}
         {{- end }}
-      {{- if or (not .Values.persistence.enabled) .Values.persistence.existingPersistentVolumeClaim }}
       volumes:
+      {{- if or (not .Values.persistence.enabled) .Values.persistence.existingPersistentVolumeClaim }}
         - name: data
           {{- if .Values.persistence.existingPersistentVolumeClaim }}
           persistentVolumeClaim:
