@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "acoustid-index.fullname" . }}
+  labels:
+    {{- include "acoustid-index.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: acoustid-index
+      port: 6080
+      protocol: TCP
+      targetPort: 6080
+    - name: metrics
+      port: 6081
+      protocol: TCP
+      targetPort: 6081
+  selector:
+    {{- include "acoustid-index.selectorLabels" . | nindent 4 }}

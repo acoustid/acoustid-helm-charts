@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "acoustid-index.fullname" . }}
+  labels:
+    {{- include "acoustid-index.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      {{- include "acoustid-index.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "acoustid-index.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "acoustid-index.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "acoustid-index.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: chown-data-dir
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - chown -R 1000:1000 /var/lib/acoustid-index
+          volumeMounts:
+            - mountPath: /var/lib/acoustid-index
+              name: data
+      containers:
+        - name: index
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - fpi-server
+            - --directory
+            - /var/lib/acoustid-index
+            - --mmap
+            - --address
+            - 0.0.0.0
+            - --port
+            - "6080"
+            - --http
+            - --http-address
+            - 0.0.0.0
+            - --http-port
+            - "6081"
+            - --threads
+            - "16"
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            httpGet:
+              path: /health/ready
+              port: 6081
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 6080
+            timeoutSeconds: 1
+          ports:
+            - containerPort: 6080
+              name: acoustid-index
+              protocol: TCP
+            - containerPort: 6081
+              name: metrics
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/lib/acoustid-index
+              name: data
+        {{- if .Values.updater.enabled }}
+        - name: updater
+          image: "{{ .Values.updater.image.repository }}:{{ .Values.updater.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.updater.image.pullPolicy }}
+          env:
+            - name: ACOUSTID_INDEX_HOST
+              value: "127.0.0.1"
+            - name: ACOUSTID_INDEX_PORT
+              value: "6080"
+            - name: ACOUSTID_DATABASE_NAME
+              value: {{ .Values.updater.database.name }}
+            - name: ACOUSTID_DATABASE_HOST
+              value: {{ .Values.updater.database.host }}
+            {{- if and .Values.updater.database.existingSecret .Values.updater.database.userKey }}
+            - name: ACOUSTID_DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.updater.database.existingSecret }}
+                  key: {{ .Values.updater.database.userKey }}
+            {{- end }}
+            {{- if and .Values.updater.database.existingSecret .Values.updater.database.passwordKey }}
+            - name: ACOUSTID_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.updater.database.existingSecret }}
+                  key: {{ .Values.updater.database.passwordKey }}
+            {{- end }}
+        {{- end }}
+      volumes:
+      {{- if or (not .Values.persistence.enabled) .Values.persistence.existingPersistentVolumeClaim }}
+        - name: data
+          {{- if .Values.persistence.existingPersistentVolumeClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingPersistentVolumeClaim }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if and .Values.persistence.enabled (not .Values.persistence.existingPersistentVolumeClaim) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        accessModes:
+          - {{ .Values.persistence.accessMode }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
+  {{- end }}

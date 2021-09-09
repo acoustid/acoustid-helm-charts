@@ -1,0 +1,10 @@
+apiVersion: v2
+name: acoustid-index
+description: AcoustID index
+type: application
+version: 0.1.0
+appVersion: 2021.08.29.2
+maintainers:
+  - name: lalinsky
+    email: lukas@acoustid.org
+    url: https://acoustid.org
