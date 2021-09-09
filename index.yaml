@@ -1,5 +1,20 @@
 apiVersion: v1
 entries:
+  acoustid-index:
+  - apiVersion: v2
+    appVersion: 2021.08.29.2
+    created: "2021-09-09T06:21:26.641799445Z"
+    description: AcoustID index
+    digest: 9ded7f13c319d687ba3ab62f43472d7f4d76408e8ee6edbf9e5fb920b4eefb6c
+    maintainers:
+    - email: lukas@acoustid.org
+      name: lalinsky
+      url: https://acoustid.org
+    name: acoustid-index
+    type: application
+    urls:
+    - https://github.com/acoustid/acoustid-helm-charts/releases/download/acoustid-index-0.1.0/acoustid-index-0.1.0.tgz
+    version: 0.1.0
   acoustid-server:
   - apiVersion: v2
     appVersion: 2021.09.01
@@ -30,4 +45,4 @@ entries:
     urls:
     - https://github.com/acoustid/acoustid-helm-charts/releases/download/mbslave-0.1.0/mbslave-0.1.0.tgz
     version: 0.1.0
-generated: "2021-09-06T18:55:23.319397094Z"
+generated: "2021-09-09T06:21:26.642606755Z"
